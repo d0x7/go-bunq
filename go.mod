@@ -1,4 +1,4 @@
-module github.com/OGKevin/go-bunq
+module github.com/gjongenelen/go-bunq
 
 go 1.15
 
