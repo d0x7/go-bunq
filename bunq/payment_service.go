@@ -117,3 +117,17 @@ func (p *paymentService) CreatePaymentBatch(monetaryAccountID int, create Paymen
 
 	return p.client.doCURequest(p.client.formatRequestURL(fmt.Sprintf(endpointPaymentBatchCreate, userID, monetaryAccountID)), bodyRaw, http.MethodPost)
 }
+
+func (p *paymentService) CreatePayment(monetaryAccountID int, create PaymentCreate) (*responseBunqID, error) {
+	userID, err := p.client.GetUserID()
+	if err != nil {
+		return nil, err
+	}
+
+	bodyRaw, err := json.Marshal(create)
+	if err != nil {
+		return nil, errors.Wrap(err, "bunq: could not marshal body")
+	}
+
+	return p.client.doCURequest(p.client.formatRequestURL(fmt.Sprintf(endpointPaymentCreate, userID, monetaryAccountID)), bodyRaw, http.MethodPost)
+}
