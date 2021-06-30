@@ -13,7 +13,9 @@ const (
 
 	endpointDraftPaymentCreate string = "user/%d/monetary-account/%d/draft-payment"
 	endpointDraftPaymentWithID string = "user/%d/monetary-account/%d/draft-payment/%d"
-
+	
+	endpointPaymentCreate      string = "user/%d/monetary-account/%d/payment"
+	
 	endpointPaymentGet       string = "user/%d/monetary-account/%d/payment?count=200"
 	endpointPaymentGetWithID string = "user/%d/monetary-account/%d/payment/%d"
 
