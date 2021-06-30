@@ -522,6 +522,9 @@ func (c *Client) getSessionExpInSec() (int64, error) {
 	if c.IsUserPerson() {
 		return c.sessionServerContext.UserPerson.SessionTimeout, nil
 	} else if c.IsUserCompany() {
+		if c.sessionServerContext.UserCompany.SessionTimeout == 0 {
+			return 60, nil
+		}
 		return c.sessionServerContext.UserCompany.SessionTimeout, nil
 	}
 
