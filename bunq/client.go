@@ -327,7 +327,7 @@ func shouldSignOrVerify(url string) bool {
 
 func (*Client) setAllDefaultHeader(r *http.Request) {
 	r.Header.Set(headerCacheControl, "no-cache")
-	r.Header.Set(headerUserAgent, fmt.Sprintf("OGKevin-go-bunq-%s", os.Getenv("v0.1.2")))
+	r.Header.Set(headerUserAgent, "go-bunq")
 	r.Header.Set(headerXBunqLan, "en_US")
 	r.Header.Set(headerXBunqRegion, "nl_NL")
 	r.Header.Set(headerXBunqGeoLocation, "0 0 0 0 NL")
