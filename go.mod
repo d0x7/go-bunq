@@ -1,6 +1,6 @@
-module github.com/gjongenelen/go-bunq
+module github.com/d0x7/go-bunq
 
-go 1.15
+go 1.22.1
 
 require (
 	github.com/kr/pretty v0.1.0 // indirect
