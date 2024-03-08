@@ -444,6 +444,15 @@ func (m *MonetaryAccountSaving) GetIBAN() string {
 	return getIBAN(m.Alias)
 }
 
+// PaymentDirection represents the direction of a payment, either incoming or outgoing.
+type PaymentDirection string
+
+// Possible values for PaymentDirection.
+const (
+	PaymentDirectionIncoming PaymentDirection = "INCOMING" // Represents an incoming payment.
+	PaymentDirectionOutgoing PaymentDirection = "OUTGOING" // Represents an outgoing payment.
+)
+
 type Payment struct {
 	common
 	MonetaryAccountID            int                            `json:"monetary_account_id"`
@@ -468,6 +477,28 @@ type Payment struct {
 	AllowChat                    bool                           `json:"allow_chat"`
 	RequestReferenceSplitTheBill []requestReferenceSplitTheBill `json:"request_reference_split_the_bill"`
 	BalanceAfterMutation         Amount                         `json:"balance_after_mutation"`
+}
+
+// IsIncoming checks if the payment amount is positive, indicating an incoming payment.
+// Returns true if the payment is incoming, false otherwise.
+func (p *Payment) IsIncoming() bool {
+	return p.Amount.Decimal.IsPositive()
+}
+
+// IsOutgoing checks if the payment amount is negative, indicating an outgoing payment.
+// Returns true if the payment is outgoing, false otherwise.
+func (p *Payment) IsOutgoing() bool {
+	return p.Amount.Decimal.IsNegative()
+}
+
+// GetDirection determines the direction of the payment (incoming or outgoing) based on its amount.
+// Returns PaymentDirectionIncoming if the payment is incoming,
+// or PaymentDirectionOutgoing if the payment is outgoing.
+func (p *Payment) GetDirection() PaymentDirection {
+	if p.IsIncoming() {
+		return PaymentDirectionIncoming
+	}
+	return PaymentDirectionOutgoing
 }
 
 // PaymentBatch a batch of payments
