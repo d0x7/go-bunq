@@ -1,5 +1,10 @@
 package bunq
 
+import (
+	"encoding/json"
+	"github.com/shopspring/decimal"
+)
+
 type installation struct {
 	ID              bunqID          `json:"Id"`
 	Token           token           `json:"Token"`
@@ -176,8 +181,31 @@ type customerLimit struct {
 }
 
 type Amount struct {
-	Value    string `json:"value"`
-	Currency string `json:"currency"`
+	Value    string          `json:"value"`
+	Currency string          `json:"currency"`
+	Decimal  decimal.Decimal `json:"-"`
+}
+
+func (a *Amount) UnmarshalJSON(data []byte) error {
+	var raw struct {
+		Value    string `json:"value"`
+		Currency string `json:"currency"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+
+	a.Currency = raw.Currency
+	a.Value = raw.Value
+
+	dec, err := decimal.NewFromString(raw.Value)
+	if err != nil {
+		a.Decimal = decimal.Zero
+	} else {
+		a.Decimal = dec
+	}
+
+	return nil
 }
 
 type billingContract struct {
@@ -260,6 +288,11 @@ func (m *MonetaryAccountBank) GetIBANPointer() *Pointer {
 	return getIBANPointer(m.Alias)
 }
 
+// GetIBAN returns the IBAN for the given MA, or an empty string if not found.
+func (m *MonetaryAccountBank) GetIBAN() string {
+	return getIBAN(m.Alias)
+}
+
 func getIBANPointer(allP []Pointer) *Pointer {
 	for _, p := range allP {
 		if p.PType == "IBAN" {
@@ -268,6 +301,15 @@ func getIBANPointer(allP []Pointer) *Pointer {
 	}
 
 	return nil
+}
+
+func getIBAN(allP []Pointer) string {
+	pointer := getIBANPointer(allP)
+	if pointer == nil {
+		return ""
+	}
+
+	return pointer.Value
 }
 
 type monetaryAccountProfile struct {
@@ -399,9 +441,14 @@ type MonetaryAccountSaving struct {
 	SavingsGoalProgress    string                 `json:"savings_goal_progress"`
 }
 
-// GetIBANPointer returns the Pointer iban of this ma.
+// GetIBANPointer returns the IBAN Pointer for the given MA.
 func (s *MonetaryAccountSaving) GetIBANPointer() *Pointer {
 	return getIBANPointer(s.Alias)
+}
+
+// GetIBAN returns the IBAN for the given MA, or an empty string if not found.
+func (m *MonetaryAccountSaving) GetIBAN() string {
+	return getIBAN(m.Alias)
 }
 
 type Payment struct {
