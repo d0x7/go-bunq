@@ -35,6 +35,13 @@ const (
 	BaseURLProduction string = "https://api.bunq.com/v1/"
 )
 
+var (
+	// WildcardIP is used to allow all ip addresses to connect to the bunq api. Use this with caution.
+	WildcardIP = []string{"*"}
+	// CurrentIP is used to allow only the current ip address to connect to the bunq api.
+	CurrentIP []string
+)
+
 // DetermineBaseURL returns the proper base url.
 // If the env variable BUNQ_SANDBOX=true exists, sandbox is used, else production
 func DetermineBaseURL() string {
@@ -62,10 +69,11 @@ type Client struct {
 	*http.Client
 	ctx context.Context
 
-	baseURL     string
-	apiKey      string
-	Debug       bool
-	description string
+	baseURL      string
+	apiKey       string
+	Debug        bool
+	description  string
+	permittedIps []string
 
 	Err error
 
@@ -116,7 +124,7 @@ func NewClientFromContext(ctx context.Context, clientCtx *ClientContext) (*Clien
 
 	serverPubKey := parseResult.(*rsa.PublicKey)
 
-	c := NewClient(ctx, clientCtx.BaseURL, privateKey, clientCtx.APIKey, "")
+	c := NewClient(ctx, clientCtx.BaseURL, privateKey, clientCtx.APIKey, "", []string{})
 	c.apiKey = clientCtx.APIKey
 	c.baseURL = clientCtx.BaseURL
 
@@ -132,12 +140,13 @@ func NewClientFromContext(ctx context.Context, clientCtx *ClientContext) (*Clien
 }
 
 // NewClient create a new bunq client to use.
-func NewClient(ctx context.Context, url string, key *rsa.PrivateKey, apikey, description string) *Client {
+func NewClient(ctx context.Context, url string, key *rsa.PrivateKey, apikey, description string, permittedIps []string) *Client {
 	c := Client{}
 	c.ctx = ctx
 	c.Client = http.DefaultClient
 	c.baseURL = url
 	c.description = description
+	c.permittedIps = permittedIps
 
 	c.apiKey = apikey
 	c.privateKey = key
