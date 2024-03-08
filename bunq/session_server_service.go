@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"log"
 	"net/http"
 
@@ -12,8 +13,8 @@ import (
 
 type sessionServerService service
 
-func (s *sessionServerService) create() (*responseSessionServer, error) {
-	bodyStruct := requestSessionServer{
+func (s *sessionServerService) create() (*model.ResponseSessionServer, error) {
+	bodyStruct := model.RequestSessionServer{
 		Secret: s.client.apiKey,
 	}
 	bodyRaw, err := json.Marshal(bodyStruct)
@@ -35,7 +36,7 @@ func (s *sessionServerService) create() (*responseSessionServer, error) {
 		return nil, errors.Wrap(err, "bunq: request to session-server failed")
 	}
 
-	var resSessionServer responseSessionServer
+	var resSessionServer model.ResponseSessionServer
 	defer res.Body.Close()
 
 	err = json.NewDecoder(res.Body).Decode(&resSessionServer)
@@ -49,9 +50,9 @@ func (s *sessionServerService) create() (*responseSessionServer, error) {
 	return resSessionServerProp, err
 }
 
-func createProperSessionServerResponse(r *responseSessionServer) *responseSessionServer {
-	return &responseSessionServer{
-		Response: []sessionServer{
+func createProperSessionServerResponse(r *model.ResponseSessionServer) *model.ResponseSessionServer {
+	return &model.ResponseSessionServer{
+		Response: []model.SessionServer{
 			{
 				ID:          r.Response[0].ID,
 				Token:       r.Response[1].Token,
@@ -63,12 +64,12 @@ func createProperSessionServerResponse(r *responseSessionServer) *responseSessio
 	}
 }
 
-func (s *sessionServerService) updateClient(r *responseSessionServer) {
+func (s *sessionServerService) updateClient(r *model.ResponseSessionServer) {
 	s.updateClientToken(r)
 	s.client.updateUserFlag()
 }
 
-func (s *sessionServerService) updateClientToken(r *responseSessionServer) {
+func (s *sessionServerService) updateClientToken(r *model.ResponseSessionServer) {
 	s.client.sessionServerContext = &r.Response[0]
 
 	s.client.tokenMutex.Lock()

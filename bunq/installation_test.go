@@ -1,6 +1,7 @@
 package bunq
 
 import (
+	"github.com/d0x7/go-bunq/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,12 +17,12 @@ func TestIntsallation(t *testing.T) {
 	defer fakeServer.Close()
 
 	installationRespActual, err := c.installation.create()
-	if !assert.NoError(t, err ) {
+	if !assert.NoError(t, err) {
 		return
 	}
 
-	installationRespProp := responseInstallation{
-		Response: []installation{
+	installationRespProp := model.ResponseInstallation{
+		Response: []model.Installation{
 			{
 				ID:              resInstallation.Response[0].ID,
 				Token:           resInstallation.Response[1].Token,

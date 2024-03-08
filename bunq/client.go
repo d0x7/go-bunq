@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"github.com/google/uuid"
 	"io"
 	"io/ioutil"
@@ -84,7 +85,9 @@ type Client struct {
 	privateKey      *rsa.PrivateKey
 	serverPublicKey *rsa.PublicKey
 
-	userType
+	isUserPerson  bool
+	isUserCompany bool
+	isUserAPIkey  bool
 
 	// initOnce makes sure that init is called only once per instance. This will help that no new
 	// new device keeps being registered etc.
@@ -93,8 +96,8 @@ type Client struct {
 	tokenMutex sync.RWMutex
 	// token is the token that needs to be in the auth header.
 	token                *string
-	installationContext  *installation
-	sessionServerContext *sessionServer
+	installationContext  *model.Installation
+	sessionServerContext *model.SessionServer
 
 	common                  service
 	installation            *installationService
@@ -110,7 +113,7 @@ type Client struct {
 }
 
 // NewClientFromContext create a new bunq client from a saved client context.
-func NewClientFromContext(ctx context.Context, clientCtx *ClientContext) (*Client, error) {
+func NewClientFromContext(ctx context.Context, clientCtx *model.ClientContext) (*Client, error) {
 	privateKey, err := x509.ParsePKCS1PrivateKey(clientCtx.PrivateKey)
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: could not parse private key")
@@ -140,11 +143,11 @@ func NewClientFromContext(ctx context.Context, clientCtx *ClientContext) (*Clien
 }
 
 // NewClient create a new bunq client to use.
-func NewClient(ctx context.Context, url string, key *rsa.PrivateKey, apikey, description string, permittedIps []string) *Client {
+func NewClient(ctx context.Context, baseURL string, key *rsa.PrivateKey, apikey, description string, permittedIps []string) *Client {
 	c := Client{}
 	c.ctx = ctx
 	c.Client = http.DefaultClient
-	c.baseURL = url
+	c.baseURL = baseURL
 	c.description = description
 	c.permittedIps = permittedIps
 
@@ -294,7 +297,7 @@ func (c *Client) do(r *http.Request) (*http.Response, error) {
 
 		errResponse := createErrorResponse(res)
 
-		if len(errResponse.Error) == 0 {	
+		if len(errResponse.Error) == 0 {
 			return nil, fmt.Errorf(
 				"bunq: http request failed with status %d and response header: %q",
 				res.StatusCode,
@@ -367,11 +370,11 @@ func (c *Client) formatRequestURL(path string) string {
 	return c.baseURL + path
 }
 
-func createErrorResponse(r *http.Response) responseError {
+func createErrorResponse(r *http.Response) model.ResponseError {
 	defer r.Body.Close()
 	resBody, _ := ioutil.ReadAll(r.Body)
 
-	var errorResponse responseError
+	var errorResponse model.ResponseError
 	_ = json.Unmarshal(resBody, &errorResponse)
 
 	return errorResponse
@@ -382,14 +385,14 @@ func generateRequestID() string {
 }
 
 // ExportClientContext exports the client context of the current client.
-func (c *Client) ExportClientContext() (ClientContext, error) {
+func (c *Client) ExportClientContext() (model.ClientContext, error) {
 	p := x509.MarshalPKCS1PrivateKey(c.privateKey)
 	userID, err := c.GetUserID()
 	if err != nil {
-		return ClientContext{}, err
+		return model.ClientContext{}, err
 	}
 
-	ctx := ClientContext{
+	ctx := model.ClientContext{
 		PrivateKey:           p,
 		InstallationContext:  c.installationContext,
 		SessionServerContext: c.sessionServerContext,
@@ -591,13 +594,13 @@ func (c *Client) parseResponse(res *http.Response, obj interface{}) error {
 	return nil
 }
 
-func (c *Client) doCURequest(url string, bodyRaw []byte, httpMethod string) (*responseBunqID, error) {
+func (c *Client) doCURequest(url string, bodyRaw []byte, httpMethod string) (*model.ResponseBunqID, error) {
 	res, err := c.preformRequest(httpMethod, url, bytes.NewBuffer(bodyRaw))
 	if err != nil {
 		return nil, err
 	}
 
-	var resBunqID responseBunqID
+	var resBunqID model.ResponseBunqID
 
 	return &resBunqID, c.parseResponse(res, &resBunqID)
 }

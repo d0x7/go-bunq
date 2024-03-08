@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -48,7 +49,7 @@ func TestSessionRenewal(t *testing.T) {
 	defer cancel()
 	defer fakeServer.Close()
 
-	var cContext ClientContext
+	var cContext model.ClientContext
 
 	file, err := os.Open("../testdata/bunq/client_context.json")
 	if err != nil {

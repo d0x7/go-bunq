@@ -6,13 +6,14 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"github.com/d0x7/go-bunq/model"
 	"github.com/pkg/errors"
 	"net/http"
 )
 
 type installationService service
 
-func (i installationService) create() (*responseInstallation, error) {
+func (i installationService) create() (*model.ResponseInstallation, error) {
 	body, err := i.createInstallationBody()
 	if err != nil {
 		return nil, err
@@ -32,7 +33,7 @@ func (i installationService) create() (*responseInstallation, error) {
 		return nil, err
 	}
 
-	var resInstallation responseInstallation
+	var resInstallation model.ResponseInstallation
 	defer res.Body.Close()
 
 	err = json.NewDecoder(res.Body).Decode(&resInstallation)
@@ -60,7 +61,7 @@ func (i *installationService) createInstallationBody() ([]byte, error) {
 	}
 
 	pubBtye := pem.EncodeToMemory(&pubKeyPemBlock)
-	bodyStruct := requestInstallation{ClientPublicKey: string(pubBtye)}
+	bodyStruct := model.RequestInstallation{ClientPublicKey: string(pubBtye)}
 	bodyData, err := json.Marshal(bodyStruct)
 	if err != nil {
 		return nil, err
@@ -69,9 +70,9 @@ func (i *installationService) createInstallationBody() ([]byte, error) {
 	return bodyData, nil
 }
 
-func createProperInstallationResponse(res responseInstallation) responseInstallation {
-	return responseInstallation{
-		Response: []installation{
+func createProperInstallationResponse(res model.ResponseInstallation) model.ResponseInstallation {
+	return model.ResponseInstallation{
+		Response: []model.Installation{
 			{
 				ID:              res.Response[0].ID,
 				Token:           res.Response[1].Token,
@@ -81,7 +82,7 @@ func createProperInstallationResponse(res responseInstallation) responseInstalla
 	}
 }
 
-func (i *installationService) setInstallationContextToClient(res responseInstallation) {
+func (i *installationService) setInstallationContextToClient(res model.ResponseInstallation) {
 	i.client.installationContext = &res.Response[0]
 
 	i.client.tokenMutex.Lock()

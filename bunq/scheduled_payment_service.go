@@ -2,6 +2,7 @@ package bunq
 
 import (
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -9,7 +10,7 @@ import (
 
 type scheduledPaymentService service
 
-func (sp *scheduledPaymentService) GetAllScheduledPayments(monetaryAccountID int) (*ResponseScheduledPaymentsGet, error) {
+func (sp *scheduledPaymentService) GetAllScheduledPayments(monetaryAccountID int) (*model.ResponseScheduledPaymentsGet, error) {
 	userID, err := sp.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -20,7 +21,7 @@ func (sp *scheduledPaymentService) GetAllScheduledPayments(monetaryAccountID int
 		return nil, errors.Wrap(err, "bunq: request to get all scheduled payments failed")
 	}
 
-	var resSpGet ResponseScheduledPaymentsGet
+	var resSpGet model.ResponseScheduledPaymentsGet
 
 	return &resSpGet, sp.client.parseResponse(res, &resSpGet)
 }

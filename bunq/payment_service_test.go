@@ -2,6 +2,7 @@ package bunq
 
 import (
 	"context"
+	"github.com/d0x7/go-bunq/model"
 	"log"
 	"testing"
 
@@ -16,7 +17,7 @@ func ExamplePaymentService_CreateBatchPayment() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	c := NewClient(ctx, BaseURLSandbox, key, "sandbox_ab7df7985a66133b1abecf42871801edaafe5bc51ef9769f5a032876", "My awesome app")
+	c := NewClient(ctx, BaseURLSandbox, key, "sandbox_ab7df7985a66133b1abecf42871801edaafe5bc51ef9769f5a032876", "My awesome app", CurrentIP)
 	err = c.Init()
 	if err != nil {
 		panic(err)
@@ -27,7 +28,7 @@ func ExamplePaymentService_CreateBatchPayment() {
 
 		_, err = c.PaymentService.CreatePaymentBatch(
 			10111,
-			PaymentBatchCreate{
+			model.PaymentBatchCreate{
 				Payments: generateBatchEntries(100),
 			},
 		)
@@ -96,14 +97,14 @@ func TestDraftPaymentUpdate(t *testing.T) {
 	_, err = c.PaymentService.UpdateDraftPayment(
 		res.Response[0].ID.ID,
 		9618,
-		requestUpdateDraftPayment{
-			requestCreateDraftPayment: requestCreateDraftPayment{
-				Entries: append(allDraftPaymentEntry, draftPaymentEntryCreate{
-					Amount: Amount{
+		model.RequestUpdateDraftPayment{
+			RequestCreateDraftPayment: model.RequestCreateDraftPayment{
+				Entries: append(allDraftPaymentEntry, model.DraftPaymentEntryCreate{
+					Amount: model.Amount{
 						Currency: "EUR",
 						Value:    "1",
 					},
-					CounterpartyAlias: Pointer{
+					CounterpartyAlias: model.Pointer{
 						PType: "EMAIL",
 						Value: "bravo@bunq.com",
 					},
@@ -120,18 +121,18 @@ func TestDraftPaymentUpdate(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func createNewDraftPayment(c *Client) (*responseBunqID, error) {
+func createNewDraftPayment(c *Client) (*model.ResponseBunqID, error) {
 	i := 1
 	return c.PaymentService.CreateDraftPayment(
 		9618,
-		requestCreateDraftPayment{
-			Entries: []draftPaymentEntryCreate{
+		model.RequestCreateDraftPayment{
+			Entries: []model.DraftPaymentEntryCreate{
 				{
-					Amount: Amount{
+					Amount: model.Amount{
 						Currency: "EUR",
 						Value:    "1",
 					},
-					CounterpartyAlias: Pointer{
+					CounterpartyAlias: model.Pointer{
 						PType: "EMAIL",
 						Value: "bravo@bunq.com",
 					},
@@ -143,18 +144,18 @@ func createNewDraftPayment(c *Client) (*responseBunqID, error) {
 	)
 }
 
-func generateBatchEntries(nr int) []PaymentCreate {
-	var entries []PaymentCreate
+func generateBatchEntries(nr int) []model.PaymentCreate {
+	var entries []model.PaymentCreate
 
 	for i := 0; i < nr; i++ {
 		entries = append(
 			entries,
-			PaymentCreate{
-				Amount: Amount{
+			model.PaymentCreate{
+				Amount: model.Amount{
 					Currency: "EUR",
 					Value:    "0.01",
 				},
-				CounterpartyAlias: Pointer{
+				CounterpartyAlias: model.Pointer{
 					PType: "EMAIL",
 					Value: "bravo@bunq.com",
 				},
@@ -166,13 +167,13 @@ func generateBatchEntries(nr int) []PaymentCreate {
 	return entries
 }
 
-func convertDraftPaymentEntryToCreateEntry(allEntry ...draftPaymentEntry) []draftPaymentEntryCreate {
-	var allCreateEntry []draftPaymentEntryCreate
+func convertDraftPaymentEntryToCreateEntry(allEntry ...model.DraftPaymentEntry) []model.DraftPaymentEntryCreate {
+	var allCreateEntry []model.DraftPaymentEntryCreate
 
 	for _, entry := range allEntry {
-		allCreateEntry = append(allCreateEntry, draftPaymentEntryCreate{
+		allCreateEntry = append(allCreateEntry, model.DraftPaymentEntryCreate{
 			Amount: entry.Amount,
-			CounterpartyAlias: Pointer{
+			CounterpartyAlias: model.Pointer{
 				PType: "IBAN",
 				Value: entry.CounterpartyAlias.IBAN,
 				Name:  &entry.CounterpartyAlias.DisplayName,

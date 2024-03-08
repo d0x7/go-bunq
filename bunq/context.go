@@ -3,6 +3,7 @@ package bunq
 import (
 	"context"
 	"encoding/json"
+	"github.com/d0x7/go-bunq/model"
 	"github.com/pkg/errors"
 	"os"
 )
@@ -10,13 +11,13 @@ import (
 // CreateContext registers a new API key and device, to create a session.
 // The hereby created API context is then saved to the specified contextFile, and may be loaded at a later time using LoadContext.
 // PermittedIps may either use bunq.WildcardIP or bunq.CurrentIP, or a custom list of specific IP addresses or ranges.
-func CreateContext(ctx context.Context, url, apiKey, deviceDescription string, permittedIps []string, contextFile string) (*Client, error) {
+func CreateContext(ctx context.Context, baseURL, apiKey, deviceDescription string, permittedIps []string, contextFile string) (*Client, error) {
 	key, err := CreateNewKeyPair()
 	if err != nil {
 		return nil, errors.Wrap(err, "creating new key pair")
 	}
 
-	client := NewClient(ctx, url, key, apiKey, deviceDescription, permittedIps)
+	client := NewClient(ctx, baseURL, key, apiKey, deviceDescription, permittedIps)
 
 	if err := client.Init(); err != nil {
 		return nil, errors.Wrap(err, "initializing bunq client")
@@ -51,7 +52,7 @@ func SaveContext(client *Client, contextFile string) error {
 
 // LoadContext loads a previously created API context from the specified file and initializes a new client from it.
 func LoadContext(ctx context.Context, file string) (*Client, error) {
-	var clientContext ClientContext
+	var clientContext model.ClientContext
 
 	readFile, err := os.ReadFile(file)
 	if err != nil {

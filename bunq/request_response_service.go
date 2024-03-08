@@ -2,6 +2,7 @@ package bunq
 
 import (
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -10,7 +11,7 @@ import (
 type requestResponseService service
 
 // GetAllRequestResponses returns all request responses for a given account
-func (p *requestResponseService) GetAllRequestResponses(monetaryAccountID uint) (*ResponseRequestResponsesGet, error) {
+func (p *requestResponseService) GetAllRequestResponses(monetaryAccountID uint) (*model.ResponseRequestResponsesGet, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: request-response service: could not determine user id")
@@ -21,13 +22,13 @@ func (p *requestResponseService) GetAllRequestResponses(monetaryAccountID uint) 
 		return nil, err
 	}
 
-	var resStruct ResponseRequestResponsesGet
+	var resStruct model.ResponseRequestResponsesGet
 
 	return &resStruct, p.client.parseResponse(res, &resStruct)
 }
 
 // GetAllOlderPayment calls the older url from the Pagination
-func (p *requestResponseService) GetAllOlderRequestResponses(pagi Pagination) (*ResponseRequestResponsesGet, error) {
+func (p *requestResponseService) GetAllOlderRequestResponses(pagi model.Pagination) (*model.ResponseRequestResponsesGet, error) {
 	if pagi.OlderURL == "" {
 		return nil, nil
 	}
@@ -37,7 +38,7 @@ func (p *requestResponseService) GetAllOlderRequestResponses(pagi Pagination) (*
 		return nil, err
 	}
 
-	var resStruct ResponseRequestResponsesGet
+	var resStruct model.ResponseRequestResponsesGet
 
 	return &resStruct, p.client.parseResponse(res, &resStruct)
 }

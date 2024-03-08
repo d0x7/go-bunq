@@ -3,6 +3,7 @@ package bunq
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -10,7 +11,7 @@ import (
 
 type paymentService service
 
-func (p *paymentService) CreateDraftPayment(monetaryAccountID int, rBody requestCreateDraftPayment) (*responseBunqID, error) {
+func (p *paymentService) CreateDraftPayment(monetaryAccountID int, rBody model.RequestCreateDraftPayment) (*model.ResponseBunqID, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -24,7 +25,7 @@ func (p *paymentService) CreateDraftPayment(monetaryAccountID int, rBody request
 	return p.client.doCURequest(p.client.formatRequestURL(fmt.Sprintf(endpointDraftPaymentCreate, userID, monetaryAccountID)), bodyRaw, http.MethodPost)
 }
 
-func (p *paymentService) UpdateDraftPayment(id, monetaryAccountID int, rBody requestUpdateDraftPayment) (*responseBunqID, error) {
+func (p *paymentService) UpdateDraftPayment(id, monetaryAccountID int, rBody model.RequestUpdateDraftPayment) (*model.ResponseBunqID, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func (p *paymentService) UpdateDraftPayment(id, monetaryAccountID int, rBody req
 	return p.client.doCURequest(p.client.formatRequestURL(fmt.Sprintf(endpointDraftPaymentWithID, userID, monetaryAccountID, id)), bodyRaw, http.MethodPut)
 }
 
-func (p *paymentService) GetDraftPayment(id, monetaryAccountID int) (*responseDraftPaymentGet, error) {
+func (p *paymentService) GetDraftPayment(id, monetaryAccountID int) (*model.ResponseDraftPaymentGet, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -49,13 +50,13 @@ func (p *paymentService) GetDraftPayment(id, monetaryAccountID int) (*responseDr
 		return nil, err
 	}
 
-	var resStruct responseDraftPaymentGet
+	var resStruct model.ResponseDraftPaymentGet
 
 	return &resStruct, p.client.parseResponse(res, &resStruct)
 }
 
 // GetPayment returns a specific payment for a given account
-func (p *paymentService) GetPayment(monetaryAccountID uint, paymentID uint) (*ResponsePaymentGet, error) {
+func (p *paymentService) GetPayment(monetaryAccountID uint, paymentID uint) (*model.ResponsePaymentGet, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: payment service: could not determine user id")
@@ -66,13 +67,13 @@ func (p *paymentService) GetPayment(monetaryAccountID uint, paymentID uint) (*Re
 		return nil, err
 	}
 
-	var resStruct ResponsePaymentGet
+	var resStruct model.ResponsePaymentGet
 
 	return &resStruct, p.client.parseResponse(res, &resStruct)
 }
 
 // GetAllPayment returns all the payments for a given account
-func (p *paymentService) GetAllPayment(monetaryAccountID uint) (*ResponsePaymentGet, error) {
+func (p *paymentService) GetAllPayment(monetaryAccountID uint) (*model.ResponsePaymentGet, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: payment service: could not determine user id")
@@ -83,13 +84,13 @@ func (p *paymentService) GetAllPayment(monetaryAccountID uint) (*ResponsePayment
 		return nil, err
 	}
 
-	var resStruct ResponsePaymentGet
+	var resStruct model.ResponsePaymentGet
 
 	return &resStruct, p.client.parseResponse(res, &resStruct)
 }
 
 // GetAllOlderPayment calls the older url from the Pagination
-func (p *paymentService) GetAllOlderPayment(pagi Pagination) (*ResponsePaymentGet, error) {
+func (p *paymentService) GetAllOlderPayment(pagi model.Pagination) (*model.ResponsePaymentGet, error) {
 	if pagi.OlderURL == "" {
 		return nil, nil
 	}
@@ -99,12 +100,12 @@ func (p *paymentService) GetAllOlderPayment(pagi Pagination) (*ResponsePaymentGe
 		return nil, err
 	}
 
-	var resStruct ResponsePaymentGet
+	var resStruct model.ResponsePaymentGet
 
 	return &resStruct, p.client.parseResponse(res, &resStruct)
 }
 
-func (p *paymentService) CreatePaymentBatch(monetaryAccountID int, create PaymentBatchCreate) (*responseBunqID, error) {
+func (p *paymentService) CreatePaymentBatch(monetaryAccountID int, create model.PaymentBatchCreate) (*model.ResponseBunqID, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -118,7 +119,7 @@ func (p *paymentService) CreatePaymentBatch(monetaryAccountID int, create Paymen
 	return p.client.doCURequest(p.client.formatRequestURL(fmt.Sprintf(endpointPaymentBatchCreate, userID, monetaryAccountID)), bodyRaw, http.MethodPost)
 }
 
-func (p *paymentService) CreatePayment(monetaryAccountID int, create PaymentCreate) (*responseBunqID, error) {
+func (p *paymentService) CreatePayment(monetaryAccountID int, create model.PaymentCreate) (*model.ResponseBunqID, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, err

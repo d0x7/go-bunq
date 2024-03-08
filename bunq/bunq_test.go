@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -99,100 +100,100 @@ func createClientWithFakeServer(t *testing.T) (*Client, *httptest.Server, contex
 		t.Fatal(err)
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	c := NewClient(ctx, fmt.Sprintf("%s/v1/", fakeServer.URL), key, "", "")
+	c := NewClient(ctx, fmt.Sprintf("%s/v1/", fakeServer.URL), key, "", "", CurrentIP)
 
 	return c, fakeServer, cancel
 }
 
-func getInstallationResponse(t *testing.T) *responseInstallation {
-	var obj responseInstallation
+func getInstallationResponse(t *testing.T) *model.ResponseInstallation {
+	var obj model.ResponseInstallation
 	res := createResponseStruct(t, formatFilePathByName("installation_response"), &obj)
 
-	return res.(*responseInstallation)
+	return res.(*model.ResponseInstallation)
 }
 
-func getDeviceServerResponse(t *testing.T) *responseDeviceServer {
-	var obj responseDeviceServer
+func getDeviceServerResponse(t *testing.T) *model.ResponseDeviceServer {
+	var obj model.ResponseDeviceServer
 	res := createResponseStruct(t, formatFilePathByName("device_server_response"), &obj)
 
-	return res.(*responseDeviceServer)
+	return res.(*model.ResponseDeviceServer)
 }
 
-func getSessionServerResponse(t *testing.T) *responseSessionServer {
-	var obj responseSessionServer
+func getSessionServerResponse(t *testing.T) *model.ResponseSessionServer {
+	var obj model.ResponseSessionServer
 	res := createResponseStruct(t, formatFilePathByName("session_server_response"), &obj)
 
-	return res.(*responseSessionServer)
+	return res.(*model.ResponseSessionServer)
 }
 
-func getUserPersonGetResponse(t *testing.T) *responseUserPerson {
-	var obj responseUserPerson
+func getUserPersonGetResponse(t *testing.T) *model.ResponseUserPerson {
+	var obj model.ResponseUserPerson
 	res := createResponseStruct(t, formatFilePathByName("user_person_get_response"), &obj)
 
-	return res.(*responseUserPerson)
+	return res.(*model.ResponseUserPerson)
 }
 
-func getMonetaryAccountBankGet(t *testing.T) *ResponseMonetaryAccountBankGet {
-	var obj ResponseMonetaryAccountBankGet
+func getMonetaryAccountBankGet(t *testing.T) *model.ResponseMonetaryAccountBankGet {
+	var obj model.ResponseMonetaryAccountBankGet
 	res := createResponseStruct(t, formatFilePathByName("monetary_account_bank_listing_response"), &obj)
 
-	return res.(*ResponseMonetaryAccountBankGet)
+	return res.(*model.ResponseMonetaryAccountBankGet)
 }
 
-func getMonetaryAccountSavings(t *testing.T) *ResponseMonetaryAccountSavingGet {
-	var obj ResponseMonetaryAccountSavingGet
+func getMonetaryAccountSavings(t *testing.T) *model.ResponseMonetaryAccountSavingGet {
+	var obj model.ResponseMonetaryAccountSavingGet
 	res := createResponseStruct(t, formatFilePathByName("monetary_account_savings_response_get"), &obj)
 
-	return res.(*ResponseMonetaryAccountSavingGet)
+	return res.(*model.ResponseMonetaryAccountSavingGet)
 }
 
-func getGenericIDResponse(t *testing.T) *responseBunqID {
-	var obj responseBunqID
+func getGenericIDResponse(t *testing.T) *model.ResponseBunqID {
+	var obj model.ResponseBunqID
 	res := createResponseStruct(t, formatFilePathByName("generic_id_response"), &obj)
 
-	return res.(*responseBunqID)
+	return res.(*model.ResponseBunqID)
 }
 
-func getDraftPaymentGet(t *testing.T) *responseDraftPaymentGet {
-	var obj responseDraftPaymentGet
+func getDraftPaymentGet(t *testing.T) *model.ResponseDraftPaymentGet {
+	var obj model.ResponseDraftPaymentGet
 	res := createResponseStruct(t, formatFilePathByName("draft_payment_get_response"), &obj)
 
-	return res.(*responseDraftPaymentGet)
+	return res.(*model.ResponseDraftPaymentGet)
 }
 
-func getMasterCardActionGet(t *testing.T) *responseMasterCardActionGet {
-	var obj responseMasterCardActionGet
+func getMasterCardActionGet(t *testing.T) *model.ResponseMasterCardActionGet {
+	var obj model.ResponseMasterCardActionGet
 	res := createResponseStruct(t, formatFilePathByName("master_card_action_get_response"), &obj)
 
-	return res.(*responseMasterCardActionGet)
+	return res.(*model.ResponseMasterCardActionGet)
 }
 
-func getPaymentGet(t *testing.T) *ResponsePaymentGet {
-	var obj ResponsePaymentGet
+func getPaymentGet(t *testing.T) *model.ResponsePaymentGet {
+	var obj model.ResponsePaymentGet
 	res := createResponseStruct(t, formatFilePathByName("payment_get_response"), &obj)
 
-	return res.(*ResponsePaymentGet)
+	return res.(*model.ResponsePaymentGet)
 }
 
-func getScheduledPaymentGet(t *testing.T) *ResponseScheduledPaymentsGet {
-	var obj ResponseScheduledPaymentsGet
+func getScheduledPaymentGet(t *testing.T) *model.ResponseScheduledPaymentsGet {
+	var obj model.ResponseScheduledPaymentsGet
 	res := createResponseStruct(t, formatFilePathByName("schedule_payment_response"), &obj)
 
-	return res.(*ResponseScheduledPaymentsGet)
+	return res.(*model.ResponseScheduledPaymentsGet)
 }
 
-func getRequestResponseGet(t *testing.T) *ResponseRequestResponsesGet {
-	var obj ResponseRequestResponsesGet
+func getRequestResponseGet(t *testing.T) *model.ResponseRequestResponsesGet {
+	var obj model.ResponseRequestResponsesGet
 	res := createResponseStruct(t, formatFilePathByName("request_response_response"), &obj)
 
-	return res.(*ResponseRequestResponsesGet)
+	return res.(*model.ResponseRequestResponsesGet)
 }
 
-func getErrorResponse(t *testing.T) *responseError {
-	var obj responseError
+func getErrorResponse(t *testing.T) *model.ResponseError {
+	var obj model.ResponseError
 	res := createResponseStruct(t, formatFilePathByName("error_response"), &obj)
 
-	return res.(*responseError)
+	return res.(*model.ResponseError)
 }
 
 func createResponseStruct(t *testing.T, path string, obj interface{}) interface{} {

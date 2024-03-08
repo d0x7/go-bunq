@@ -2,13 +2,14 @@ package bunq
 
 import (
 	"fmt"
+	"github.com/d0x7/go-bunq/model"
 	"github.com/pkg/errors"
 	"net/http"
 )
 
 type accountService service
 
-func (a *accountService) GetAllMonetaryAccountBank() (*ResponseMonetaryAccountBankGet, error) {
+func (a *accountService) GetAllMonetaryAccountBank() (*model.ResponseMonetaryAccountBankGet, error) {
 	userID, err := a.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -19,12 +20,12 @@ func (a *accountService) GetAllMonetaryAccountBank() (*ResponseMonetaryAccountBa
 		return nil, errors.Wrap(err, "bunq: request to get all MA bank failed")
 	}
 
-	var resMaGet ResponseMonetaryAccountBankGet
+	var resMaGet model.ResponseMonetaryAccountBankGet
 
 	return &resMaGet, a.client.parseResponse(res, &resMaGet)
 }
 
-func (a *accountService) GetMonetaryAccountBank(id int) (*ResponseMonetaryAccountBankGet, error) {
+func (a *accountService) GetMonetaryAccountBank(id int) (*model.ResponseMonetaryAccountBankGet, error) {
 	userID, err := a.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -35,12 +36,12 @@ func (a *accountService) GetMonetaryAccountBank(id int) (*ResponseMonetaryAccoun
 		return nil, errors.Wrap(err, "bunq: request to get MA bank failed")
 	}
 
-	var resMaGet ResponseMonetaryAccountBankGet
+	var resMaGet model.ResponseMonetaryAccountBankGet
 
 	return &resMaGet, a.client.parseResponse(res, &resMaGet)
 }
 
-func (a *accountService) GetAllMonetaryAccountSaving() (*ResponseMonetaryAccountSavingGet, error) {
+func (a *accountService) GetAllMonetaryAccountSaving() (*model.ResponseMonetaryAccountSavingGet, error) {
 	userID, err := a.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -51,12 +52,12 @@ func (a *accountService) GetAllMonetaryAccountSaving() (*ResponseMonetaryAccount
 		return nil, errors.Wrap(err, "bunq: request to get all MA saving failed")
 	}
 
-	var resStruct ResponseMonetaryAccountSavingGet
+	var resStruct model.ResponseMonetaryAccountSavingGet
 
 	return &resStruct, a.client.parseResponse(res, &resStruct)
 }
 
-func (a *accountService) GetMonetaryAccountSaving(id int) (*ResponseMonetaryAccountSavingGet, error) {
+func (a *accountService) GetMonetaryAccountSaving(id int) (*model.ResponseMonetaryAccountSavingGet, error) {
 	userID, err := a.client.GetUserID()
 	if err != nil {
 		return nil, err
@@ -67,7 +68,7 @@ func (a *accountService) GetMonetaryAccountSaving(id int) (*ResponseMonetaryAcco
 		return nil, errors.Wrap(err, "bunq: request to get MA saving failed")
 	}
 
-	var resStruct ResponseMonetaryAccountSavingGet
+	var resStruct model.ResponseMonetaryAccountSavingGet
 
 	return &resStruct, a.client.parseResponse(res, &resStruct)
 }

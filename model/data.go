@@ -1,11 +1,11 @@
-package bunq
+package model
 
 import (
 	"encoding/json"
 	"github.com/shopspring/decimal"
 )
 
-type installation struct {
+type Installation struct {
 	ID              bunqID          `json:"Id"`
 	Token           token           `json:"Token"`
 	ServerPublicKey serverPublicKey `json:"ServerPublicKey"`
@@ -34,19 +34,12 @@ type common struct {
 	Updated string `json:"updated"`
 }
 
-type sessionServer struct {
+type SessionServer struct {
 	ID          bunqID      `json:"Id"`
 	Token       token       `json:"Token"`
 	UserCompany userCompany `json:"UserCompany"`
 	UserPerson  userPerson  `json:"UserPerson"`
 	UserAPIKey  userAPIKey  `json:"UserApiKey"`
-}
-
-// userType holds the flag of which user is currently authenticated.
-type userType struct {
-	isUserPerson  bool
-	isUserCompany bool
-	isUserAPIkey  bool
 }
 
 type user struct {
@@ -61,7 +54,7 @@ type user struct {
 	Region                             string                             `json:"region"`
 	Language                           string                             `json:"language"`
 	DailyLimitWithoutConfirmationLogin dailyLimitWithoutConfirmationLogin `json:"daily_limit_without_confirmation_login"`
-	NotificationFilters                []notificationFilter               `json:"notification_filters"`
+	NotificationFilters                []NotificationFilter               `json:"notification_filters"`
 	VersionTermsOfService              string                             `json:"version_terms_of_service"`
 	SessionTimeout                     int64                              `json:"session_timeout"`
 	DisplayName                        string                             `json:"display_name"`
@@ -121,7 +114,7 @@ type ubo struct {
 
 type dailyLimitWithoutConfirmationLogin Amount
 
-type notificationFilter struct {
+type NotificationFilter struct {
 	NotificationDeliveryMethod string `json:"notification_delivery_method"`
 	NotificationTarget         string `json:"notification_target"`
 	Category                   string `json:"category"`
@@ -254,8 +247,8 @@ type Pointer struct {
 // recreate the bunq client.
 type ClientContext struct {
 	PrivateKey           []byte         `json:"private_key"`
-	InstallationContext  *installation  `json:"installation_context"`
-	SessionServerContext *sessionServer `json:"session_server_context"`
+	InstallationContext  *Installation  `json:"installation_context"`
+	SessionServerContext *SessionServer `json:"session_server_context"`
 	APIKey               string         `json:"api_key"`
 	BaseURL              string         `json:"base_url"`
 	UserID               uint           `json:"user_id"`
@@ -278,7 +271,7 @@ type MonetaryAccountBank struct {
 	Timezone               string                 `json:"timezone"`
 	UserID                 int                    `json:"user_id"`
 	MonetaryAccountProfile monetaryAccountProfile `json:"monetary_account_profile"`
-	NotificationFilters    []notificationFilter   `json:"notification_filters"`
+	NotificationFilters    []NotificationFilter   `json:"notification_filters"`
 	Setting                monetaryAccountSetting `json:"setting"`
 	OverdraftLimit         Amount                 `json:"overdraft_limit"`
 }
@@ -332,7 +325,7 @@ type draftPayment struct {
 	Type                         string              `json:"type"`
 	UserAliasCreated             labelUser           `json:"user_alias_created"`
 	Responses                    interface{}         `json:"responses"`
-	Entries                      []draftPaymentEntry `json:"entries"`
+	Entries                      []DraftPaymentEntry `json:"entries"`
 	Object                       interface{}         `json:"object"`
 	RequestReferenceSplitTheBill []interface{}       `json:"request_reference_split_the_bill"`
 }
@@ -345,8 +338,8 @@ type labelUser struct {
 	PublicNickName string `json:"public_nick_name"`
 }
 
-type draftPaymentEntry struct {
-	Amount            Amount                      `json:"Amount"`
+type DraftPaymentEntry struct {
+	Amount            Amount                      `json:"amount"`
 	Alias             LabelMonetaryAccount        `json:"alias"`
 	CounterpartyAlias LabelMonetaryAccount        `json:"counterparty_alias"`
 	Description       string                      `json:"description"`
@@ -434,7 +427,7 @@ type MonetaryAccountSaving struct {
 	Timezone               string                 `json:"timezone"`
 	UserID                 int                    `json:"user_id"`
 	MonetaryAccountProfile monetaryAccountProfile `json:"monetary_account_profile"`
-	NotificationFilters    []notificationFilter   `json:"notification_filters"`
+	NotificationFilters    []NotificationFilter   `json:"notification_filters"`
 	Setting                monetaryAccountSetting `json:"setting"`
 	OverdraftLimit         Amount                 `json:"overdraft_limit"`
 	SavingsGoal            Amount                 `json:"savings_goal"`
@@ -454,7 +447,7 @@ func (m *MonetaryAccountSaving) GetIBAN() string {
 type Payment struct {
 	common
 	MonetaryAccountID            int                            `json:"monetary_account_id"`
-	Amount                       Amount                         `json:"Amount"`
+	Amount                       Amount                         `json:"amount"`
 	Alias                        LabelMonetaryAccount           `json:"alias"`
 	CounterpartyAlias            LabelMonetaryAccount           `json:"counterparty_alias"`
 	Description                  string                         `json:"description"`
@@ -541,7 +534,7 @@ type RequestResponse struct {
 	common
 	SubType           string               `json:"sub_type"`
 	MonetaryAccountID int                  `json:"monetary_account_id"`
-	Amount            Amount               `json:"Amount"`
+	Amount            Amount               `json:"amount"`
 	AmountResponded   Amount               `json:"amount_responded"`
 	AmountInquired    Amount               `json:"amount_inquired"`
 	Alias             LabelMonetaryAccount `json:"alias"`
