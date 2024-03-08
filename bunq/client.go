@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"io/ioutil"
 	"log"
@@ -18,7 +19,6 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
 const (
@@ -369,9 +369,7 @@ func createErrorResponse(r *http.Response) responseError {
 }
 
 func generateRequestID() string {
-	uid := uuid.NewV4()
-
-	return uid.String()
+	return uuid.New().String()
 }
 
 // ExportClientContext exports the client context of the current client.
