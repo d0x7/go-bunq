@@ -292,7 +292,10 @@ func (c *Client) do(r *http.Request) (*http.Response, error) {
 
 	if res.StatusCode != http.StatusOK {
 		if res.StatusCode == http.StatusInternalServerError {
-			return nil, errors.New(fmt.Sprintf("bunq: http request failed with status %d", res.StatusCode))
+			return nil, ErrInternalServerError
+		}
+		if res.StatusCode == http.StatusTooManyRequests {
+			return nil, ErrRateLimitExceeded
 		}
 
 		errResponse := createErrorResponse(res)
@@ -315,7 +318,7 @@ func (c *Client) do(r *http.Request) (*http.Response, error) {
 
 	err = c.verifyResponse(r, res)
 	if err != nil {
-		return nil, errors.Wrap(err, "bunq: request was successful but repose verification failed")
+		return nil, ErrResponseVerificationFailed
 	}
 
 	return res, err

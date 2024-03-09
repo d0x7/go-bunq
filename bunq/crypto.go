@@ -61,11 +61,11 @@ func (c *Client) addSignatureHeader(r *http.Request) error {
 }
 
 func (c *Client) verifySignature(r *http.Response) (bool, error) {
-	bodyBytes, _ := ioutil.ReadAll(r.Body)
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	bodyBytes, _ := io.ReadAll(r.Body)
+	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	stringToVerify := createStringToVerify(r.Body)
-	r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	h := sha256.New()
 
