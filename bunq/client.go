@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/d0x7/go-bunq/model"
 	"github.com/google/uuid"
+	"go.uber.org/ratelimit"
 	"io"
 	"io/ioutil"
 	"log"
@@ -78,9 +79,8 @@ type Client struct {
 
 	Err error
 
-	requestQueue             chan queueEntry
-	requestRateLimitMapMutex sync.RWMutex
-	requestRateLimitMap      map[string]time.Time
+	requestQueue   chan queueEntry
+	rateLimiterMap map[string]ratelimit.Limiter
 
 	privateKey      *rsa.PrivateKey
 	serverPublicKey *rsa.PublicKey
@@ -173,7 +173,7 @@ func NewEmptyClient(ctx context.Context) *Client {
 
 func (c *Client) registerServices() {
 	c.requestQueue = make(chan queueEntry, 9)
-	c.requestRateLimitMap = make(map[string]time.Time)
+	c.rateLimiterMap = make(map[string]ratelimit.Limiter)
 
 	c.common.client = c
 
@@ -216,18 +216,12 @@ func (c *Client) spawnRequestHandlerWorker() {
 			default:
 				entry := <-c.requestQueue
 
-				lastRequest := c.getLastExecutionTimeForRequest(entry.req)
-				diff := time.Now().UTC().Sub(lastRequest)
-
-				if diff.Seconds() < 1.0 {
-					if c.Debug {
-						log.Printf("bunq: waiting %f seconds before sending the http request.", 1.0-diff.Seconds())
-					}
-
-					time.Sleep(time.Duration((1.0 - diff.Seconds()) * float64(time.Second)))
+				rateKey := entry.req.Method + "|" + entry.req.URL.Path
+				if _, ok := c.rateLimiterMap[rateKey]; !ok {
+					limiter := ratelimit.New(1, ratelimit.WithoutSlack)
+					c.rateLimiterMap[rateKey] = limiter
 				}
-
-				go c.registerRequestInRateLimitMap(entry.req)
+				(c.rateLimiterMap[rateKey]).Take()
 
 				if c.Debug {
 					dump, _ := httputil.DumpRequest(entry.req, true)
@@ -250,24 +244,6 @@ func (c *Client) spawnRequestHandlerWorker() {
 			}
 		}
 	}()
-}
-
-func (c *Client) getLastExecutionTimeForRequest(r *http.Request) time.Time {
-	c.requestRateLimitMapMutex.RLock()
-	defer c.requestRateLimitMapMutex.RUnlock()
-
-	if t, ok := c.requestRateLimitMap[r.URL.Path]; ok {
-		return t
-	}
-
-	return time.Now().UTC().Add(time.Duration(-2) * time.Second)
-}
-
-func (c *Client) registerRequestInRateLimitMap(r *http.Request) {
-	c.requestRateLimitMapMutex.Lock()
-	defer c.requestRateLimitMapMutex.Unlock()
-
-	c.requestRateLimitMap[r.URL.Path] = time.Now().UTC()
 }
 
 func (c *Client) do(r *http.Request) (*http.Response, error) {
