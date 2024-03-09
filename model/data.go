@@ -251,7 +251,7 @@ type ClientContext struct {
 	SessionServerContext *SessionServer `json:"session_server_context"`
 	APIKey               string         `json:"api_key"`
 	BaseURL              string         `json:"base_url"`
-	UserID               uint           `json:"user_id"`
+	UserID               int            `json:"user_id"`
 }
 
 // MonetaryAccountBank The monetary account bank.
@@ -360,12 +360,6 @@ type LabelMonetaryAccount struct {
 	TransferwiseAccountNumber string    `json:"transferwise_account_number"`
 	TransferwiseBankCode      string    `json:"transferwise_bank_code"`
 	BunqMe                    bunqMe    `json:"bunq_me"`
-}
-
-type Pagination struct {
-	FutureURL string `json:"future_url"`
-	NewerURL  string `json:"newer_url"`
-	OlderURL  string `json:"older_url"`
 }
 
 type masterCardAction struct {

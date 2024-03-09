@@ -56,7 +56,7 @@ func (p *paymentService) GetDraftPayment(id, monetaryAccountID int) (*model.Resp
 }
 
 // GetPayment returns a specific payment for a given account
-func (p *paymentService) GetPayment(monetaryAccountID uint, paymentID uint) (*model.ResponsePaymentGet, error) {
+func (p *paymentService) GetPayment(monetaryAccountID int, paymentID int) (*model.ResponsePaymentGet, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: payment service: could not determine user id")
@@ -73,13 +73,13 @@ func (p *paymentService) GetPayment(monetaryAccountID uint, paymentID uint) (*mo
 }
 
 // GetAllPayment returns all the payments for a given account
-func (p *paymentService) GetAllPayment(monetaryAccountID uint) (*model.ResponsePaymentGet, error) {
+func (p *paymentService) GetAllPayment(monetaryAccountID int, params ...model.QueryParam) (*model.ResponsePaymentGet, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: payment service: could not determine user id")
 	}
 
-	res, err := p.client.preformRequest(http.MethodGet, p.client.formatRequestURL(fmt.Sprintf(endpointPaymentGet, userID, monetaryAccountID)), nil)
+	res, err := p.client.preformRequest(http.MethodGet, p.client.formatRequestURL(fmt.Sprintf(endpointPaymentGet, userID, monetaryAccountID)), nil, params...)
 	if err != nil {
 		return nil, err
 	}

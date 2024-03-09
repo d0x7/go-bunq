@@ -13,7 +13,7 @@ func Test_requestResponseService_GetAllRequestResponses(t *testing.T) {
 		client *Client
 	}
 	type args struct {
-		monetaryAccountID uint
+		monetaryAccountID int
 	}
 
 	c, fakeServer, cancel := createClientWithFakeServer(t)

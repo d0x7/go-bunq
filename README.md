@@ -66,3 +66,48 @@ cli, err := bunq.LoadContext(context.Background(), "bunq_go_sandbox.json")
 if err != nil { panic(err) }
 // Again, if this succeeds, the client is now initialized and may be used as usual.
 ```
+
+### Pagination
+
+For some requests, you can use pagination to get the next/previous page of results.  
+Check if the response has a `.Pagination` field,
+and if so, you can use the `.NextPage()` and `.PreviousPage()` methods to get the next or previous page of results.
+
+Be also sure to check if there are more pages available by using the `.HasNext()` and `.HasPrevious()` methods.  
+If you don't, for `PreviousPage()` you might get an error,
+and for `NextPage()` it'll try to query future pages that may,
+or may not exist (at the time when the original query was made).
+
+```go
+// Get the first two payments
+payment, err := cli.PaymentService.GetAllPayment(acc.ID, pagination.Count(2))
+if err != nil { panic(err) }
+
+// Do something with payment response //
+
+// Check if there are older payments
+if payment.Pagination.HasPrevious() {
+    // By default, the count parameter is retained from the previous request,
+    // but you can override it using model.Pagination.SetCount()
+    payment, err = cli.PaymentService.GetAllPayment(acc.ID, payment.Pagination.SetCount(5).PreviousPage())
+    if err != nil { panic(err) }
+
+    // Do something with the previous five payments // 
+} else {
+    fmt.Println("No previous payments available")
+}
+```
+
+If there is no pagination object yet, because it's the first request, you can use the functions in the `pagination` package.
+
+
+```go
+count := pagination.Count(5) // Limits the number of returned elements to 5
+newerThan := pagination.NewerThan(4024672) // Return elements newer than the given ID
+olderThan := pagination.OlderThan(6774768) // Return elements older than the given ID
+
+payment, err := cli.PaymentService.GetAllPayment(acc.ID, count, olderThan)
+if err != nil { panic(err) }
+
+// Do something with the 5 payments that are older than 6774768 //
+```

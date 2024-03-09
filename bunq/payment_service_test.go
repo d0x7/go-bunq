@@ -192,7 +192,7 @@ func Test_paymentService_GetAllPayment(t *testing.T) {
 		client *Client
 	}
 	type args struct {
-		monetaryAccountID uint
+		monetaryAccountID int
 	}
 
 	c, fakeServer, cancel := createClientWithFakeServer(t)
@@ -288,8 +288,8 @@ func Test_paymentService_GetPayment(t *testing.T) {
 	}
 
 	type args struct {
-		monetaryAccountID uint
-		paymentID         uint
+		monetaryAccountID int
+		paymentID         int
 	}
 	tests := []struct {
 		name   string

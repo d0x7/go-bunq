@@ -11,7 +11,7 @@ import (
 type requestResponseService service
 
 // GetAllRequestResponses returns all request responses for a given account
-func (p *requestResponseService) GetAllRequestResponses(monetaryAccountID uint) (*model.ResponseRequestResponsesGet, error) {
+func (p *requestResponseService) GetAllRequestResponses(monetaryAccountID int) (*model.ResponseRequestResponsesGet, error) {
 	userID, err := p.client.GetUserID()
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: request-response service: could not determine user id")

@@ -9,13 +9,13 @@ import (
 
 type accountService service
 
-func (a *accountService) GetAllMonetaryAccountBank() (*model.ResponseMonetaryAccountBankGet, error) {
+func (a *accountService) GetAllMonetaryAccountBank(params ...model.QueryParam) (*model.ResponseMonetaryAccountBankGet, error) {
 	userID, err := a.client.GetUserID()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := a.client.preformRequest(http.MethodGet, a.client.formatRequestURL(fmt.Sprintf(endpointMonetaryAccountBankListing, userID)), nil)
+	res, err := a.client.preformRequest(http.MethodGet, a.client.formatRequestURL(fmt.Sprintf(endpointMonetaryAccountBankListing, userID)), nil, params...)
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: request to get all MA bank failed")
 	}
@@ -41,13 +41,13 @@ func (a *accountService) GetMonetaryAccountBank(id int) (*model.ResponseMonetary
 	return &resMaGet, a.client.parseResponse(res, &resMaGet)
 }
 
-func (a *accountService) GetAllMonetaryAccountSaving() (*model.ResponseMonetaryAccountSavingGet, error) {
+func (a *accountService) GetAllMonetaryAccountSaving(params ...model.QueryParam) (*model.ResponseMonetaryAccountSavingGet, error) {
 	userID, err := a.client.GetUserID()
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := a.client.preformRequest(http.MethodGet, a.client.formatRequestURL(fmt.Sprintf(endpointMonetaryAccountSavingsListing, userID)), nil)
+	res, err := a.client.preformRequest(http.MethodGet, a.client.formatRequestURL(fmt.Sprintf(endpointMonetaryAccountSavingsListing, userID)), nil, params...)
 	if err != nil {
 		return nil, errors.Wrap(err, "bunq: request to get all MA saving failed")
 	}

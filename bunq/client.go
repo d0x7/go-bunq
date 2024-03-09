@@ -401,7 +401,7 @@ func (c *Client) ExportClientContext() (model.ClientContext, error) {
 		SessionServerContext: c.sessionServerContext,
 		APIKey:               c.apiKey,
 		BaseURL:              c.baseURL,
-		UserID:               uint(userID),
+		UserID:               userID,
 	}
 
 	return ctx, nil
@@ -572,10 +572,22 @@ func (c *Client) GetUserID() (int, error) {
 	return 0, fmt.Errorf("bunq: could not determine user id")
 }
 
-func (c *Client) preformRequest(method, url string, body io.Reader) (*http.Response, error) {
+func (c *Client) preformRequest(method, url string, body io.Reader, params ...model.QueryParam) (*http.Response, error) {
 	r, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("bunq: could not create request for  %s", url))
+	}
+
+	if len(params) > 0 {
+		query := r.URL.Query()
+		for _, p := range params {
+			if p != nil {
+				if err := p(query); err != nil {
+					return nil, errors.Wrap(err, "bunq: could not apply pagination option")
+				}
+			}
+		}
+		r.URL.RawQuery = query.Encode()
 	}
 
 	res, err := c.do(r)

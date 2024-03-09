@@ -13,13 +13,13 @@ const (
 
 	endpointDraftPaymentCreate string = "user/%d/monetary-account/%d/draft-payment"
 	endpointDraftPaymentWithID string = "user/%d/monetary-account/%d/draft-payment/%d"
-	
-	endpointPaymentCreate      string = "user/%d/monetary-account/%d/payment"
-	
-	endpointPaymentGet       string = "user/%d/monetary-account/%d/payment?count=200"
+
+	endpointPaymentCreate string = "user/%d/monetary-account/%d/payment"
+
+	endpointPaymentGet       string = "user/%d/monetary-account/%d/payment"
 	endpointPaymentGetWithID string = "user/%d/monetary-account/%d/payment/%d"
 
-	endpointScheduledPaymentGet string = "user/%d/monetary-account/%d/schedule-payment?count=200"
+	endpointScheduledPaymentGet string = "user/%d/monetary-account/%d/schedule-payment"
 
 	endpointMonetaryAccountBankListing string = "user/%d/monetary-account-bank"
 	endpointMonetaryAccountBankGet     string = "user/%d/monetary-account-bank/%d"
