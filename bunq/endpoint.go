@@ -19,7 +19,8 @@ const (
 	endpointPaymentGet       string = "user/%d/monetary-account/%d/payment"
 	endpointPaymentGetWithID string = "user/%d/monetary-account/%d/payment/%d"
 
-	endpointScheduledPaymentGet string = "user/%d/monetary-account/%d/schedule-payment"
+	endpointScheduledPaymentGet       string = "user/%d/monetary-account/%d/schedule-payment"
+	endpointScheduledPaymentGetWithID string = "user/%d/monetary-account/%d/schedule-payment/%d"
 
 	endpointMonetaryAccountBankListing string = "user/%d/monetary-account-bank"
 	endpointMonetaryAccountBankGet     string = "user/%d/monetary-account-bank/%d"
@@ -27,7 +28,9 @@ const (
 	endpointMonetaryAccountSavingsListing string = "user/%d/monetary-account-savings"
 	endpointMonetaryAccountSavingsGet     string = "user/%d/monetary-account-savings/%d"
 
-	endpointMasterCardActionGet string = "user/%d/monetary-account/%d/mastercard-action/%d"
+	endpointMasterCardActionGet       string = "user/%d/monetary-account/%d/mastercard-action"
+	endpointMasterCardActionGetWithID string = "user/%d/monetary-account/%d/mastercard-action/%d"
 
-	endpointRequestResponsesGet string = "user/%d/monetary-account/%d/request-response"
+	endpointRequestResponsesGet       string = "user/%d/monetary-account/%d/request-response"
+	endpointRequestResponsesGetWithID string = "user/%d/monetary-account/%d/request-response/%d"
 )
