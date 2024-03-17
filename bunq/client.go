@@ -70,17 +70,19 @@ type Client struct {
 	*http.Client
 	ctx context.Context
 
-	baseURL      string
-	apiKey       string
-	Debug        bool
-	description  string
-	permittedIps []string
+	baseURL        string
+	apiKey         string
+	Debug          bool
+	DisableBackoff bool
+	description    string
+	permittedIps   []string
 
 	Err error
 
 	requestQueue             chan queueEntry
 	requestRateLimitMapMutex sync.RWMutex
 	requestRateLimitMap      map[string]time.Time
+	rateLimitPolicy          backoff
 
 	privateKey      *rsa.PrivateKey
 	serverPublicKey *rsa.PublicKey
@@ -174,6 +176,7 @@ func NewEmptyClient(ctx context.Context) *Client {
 func (c *Client) registerServices() {
 	c.requestQueue = make(chan queueEntry, 9)
 	c.requestRateLimitMap = make(map[string]time.Time)
+	c.rateLimitPolicy = NewDefaultBackoff()
 
 	c.common.client = c
 
@@ -235,6 +238,34 @@ func (c *Client) spawnRequestHandlerWorker() {
 				}
 
 				res, err := c.Do(entry.req)
+
+				// if the request failed due to rate limiting, we will retry it with a backoff policy
+				if res.StatusCode == http.StatusTooManyRequests && !c.DisableBackoff {
+					for {
+						nextLimit := c.rateLimitPolicy.NextLimit()
+
+						if nextLimit == Stop {
+							if c.Debug {
+								fmt.Printf("bunq: request failed due to rate limit exceeded after %d retries, will not retry anymore\n", c.rateLimitPolicy.Try())
+							}
+							err = errors.Wrapf(err, "bunq: request failed due to rate limit exceeded after %d retries, will not retry anymore", c.rateLimitPolicy.Try())
+							break
+						}
+
+						if c.Debug {
+							log.Printf("bunq: request failed due to rate limited exceeded, will retry in %f seconds\n", nextLimit.Seconds())
+						}
+						time.Sleep(nextLimit)
+
+						res, err = c.Do(entry.req)
+						if res.StatusCode != http.StatusTooManyRequests {
+							if c.Debug {
+								fmt.Printf("bunq: request succeeded after %d retries\n", c.rateLimitPolicy.Try())
+							}
+							break
+						}
+					}
+				}
 
 				if err != nil && c.Debug {
 					log.Print(err)

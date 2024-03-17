@@ -111,3 +111,17 @@ if err != nil { panic(err) }
 
 // Do something with the 5 payments that are older than 6774768 //
 ```
+
+## Rate Limiting
+
+There is a built-in functionality, which should prevent the rate limit from being exceeded.
+The code is from before I forked the project, and it doesn't seem to properly function all the time.
+
+I since added a sort-of backoff policy rate limiter, that is triggered when a 429 status code is returned.
+With every failure, the wait time is increased, up to a maximum of 12 seconds.
+Therefore, if a request fails due to rate limiting, it'll try again for up to 12 seconds before returning an error.
+If you don't want this functionality, you can disable it by setting `cli.DisableBackoff` to `true`.
+In that which case a potential rate-limiting error will be returned immediately.
+
+I strongly advise against disabling this functionality, as in my experience it's favorable to potentially rather wait a few seconds for a request,
+than get an error and do the re-try logic yourself.
